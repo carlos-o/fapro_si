@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  # Redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    container_name: redis_sii
+
+  # FastAPI Application
+  app:
+    build: .
+    volumes:
+      - .:/backend
+    ports:
+      - "8000:8000"
+    container_name: fast_sii
+    command:  uvicorn main:app --host 0.0.0.0 --reload
+    restart: on-failure
+    depends_on:
+      - redis

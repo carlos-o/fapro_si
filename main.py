@@ -30,8 +30,6 @@ def index():
 
 @app.get("/uf/{date}")
 async def get_fomento_unit(date: str):
-    """
-    """
     if not validate_date(date):
         logger.error("date format is incorrect")
         raise HTTPException(status_code=400, detail="date format is incorrect, try dd-mm-yyy")
@@ -43,8 +41,10 @@ async def get_fomento_unit(date: str):
     # check in redis
     uf_price_date = REDIS_CLIENT.get(date)
     if uf_price_date is None:
+        # create instance of class
         parse_sii_instance = ParseSii(converted_date)
         try:
+            # get the uf price
             uf_price_date = parse_sii_instance.get_uf_sii()
         except NotFound as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -52,6 +52,7 @@ async def get_fomento_unit(date: str):
             raise HTTPException(status_code=500, detail=str(e))
         if uf_price_date is None:
             raise HTTPException(status_code=400, detail="Uf from specific date does not exists")
+        # store in redis
         REDIS_CLIENT.setex(date, timedelta(seconds=CACHE_TIME), uf_price_date)
         return JSONResponse(content={"uf": uf_price_date}, status_code=200)
     return JSONResponse(content={"uf": float(uf_price_date)}, status_code=200)

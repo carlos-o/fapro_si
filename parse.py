@@ -13,23 +13,21 @@ logger = logging.getLogger(__name__)
 
 class ParseSii(object):
     """
-       A class used to represent a property
+       A class used to represent a parse sii information
 
        ...
 
        Attributes
        ----------
-       property_id : str
-           id of property to find
+       date : datetime
+           date of the uf price to find
 
        Methods
        -------
-       _store_property_cache(property_info)
-            store in redis the information of property
-       _get_property_price_and_currency(property_data)
-            parse information to get the price and currency of the property
-       find_property()
-            find in the graphql of infocasa for the information on price and  type of currency of specific property
+       get_sii_information()
+       parse_html(source: str)
+       convert_uf_float(value: str)
+        get_uf_sii()
 
     """
 
@@ -38,8 +36,9 @@ class ParseSii(object):
 
     def get_sii_information(self) -> str:
         """
+            get sii information on the web page with the specific year of input
 
-        :return:
+            :return: html of page
         """
         try:
             logger.info("Make requests from sii page")
@@ -94,8 +93,10 @@ class ParseSii(object):
 
     def get_uf_sii(self):
         """
+            find in page the uf price with the specific date
 
-        :return:
+            :return: uf price of the specific date
+            :return: None is price not found or not exist
         """
         try:
             sii_html_parse = self.parse_html(self.get_sii_information())

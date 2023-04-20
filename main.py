@@ -6,9 +6,9 @@ from utils import convert_datetime
 from parse import ParseSii
 from exceptions import NotFound
 from redis_om import get_redis_connection
+from datetime import timedelta
 import logging.config
 import logging
-
 
 
 logging.config.dictConfig(LOGGING_CONFIG)
@@ -25,7 +25,7 @@ REDIS_CLIENT = get_redis_connection(
 
 @app.get("/")
 def index():
-    return "works"
+    return JSONResponse({"server": "Works"}, status_code=200)
 
 
 @app.get("/uf/{date}")
@@ -52,7 +52,6 @@ async def get_fomento_unit(date: str):
             raise HTTPException(status_code=500, detail=str(e))
         if uf_price_date is None:
             raise HTTPException(status_code=400, detail="Uf from specific date does not exists")
-        REDIS_CLIENT.set(date, uf_price_date)
-        REDIS_CLIENT.expire(date, CACHE_TIME)
+        REDIS_CLIENT.setex(date, timedelta(seconds=CACHE_TIME), uf_price_date)
         return JSONResponse(content={"uf": uf_price_date}, status_code=200)
     return JSONResponse(content={"uf": float(uf_price_date)}, status_code=200)

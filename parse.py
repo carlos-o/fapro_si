@@ -102,9 +102,8 @@ class ParseSii(object):
         except NotFound as e:
             raise NotFound(str(e))
         except Exception as e:
-            msg = f"ERROR in obtain html from sii page {str(e)}"
-            logger.error(msg)
-            raise Exception(msg)
+            logger.error(str(e))
+            raise Exception(str(e))
         logger.info("find uf from specific date")
         specific_month = sii_html_parse.find("div", {"id": f"mes_{MONTHS_YEAR.get(str(self.date.month))}"})
         if specific_month is None:
